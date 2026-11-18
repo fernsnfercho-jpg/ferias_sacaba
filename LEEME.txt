@@ -1,0 +1,109 @@
+FERIAS SACABA — RESERVA Y ADMINISTRACIÓN DE CARPAS
+================================================
+
+Aplicación PHP 8 + MySQL para publicar ferias, reservar carpas oficiales de
+3 × 4 m y aprobar, rechazar o cancelar reservas.
+
+REQUISITOS
+  - PHP 8.0 o posterior con PDO MySQL, Fileinfo y GD.
+  - MySQL 8 o MariaDB 10.3 o posterior (probado en XAMPP).
+  - AdminLTE 3.2.0, Bootstrap 4.6 y PHPMailer están incluidos localmente;
+    no se necesita CDN ni Composer para ejecutar el sitio.
+
+INSTALACIÓN EN XAMPP (paso a paso)
+  1. Copie la carpeta del proyecto a:
+       C:\xampp\htdocs\ferias_sacaba
+  2. Inicie Apache y MySQL desde el panel de XAMPP.
+  3. Revise config/config.php: por defecto usa 127.0.0.1:3306, usuario root
+     y contraseña vacía (la configuración típica de XAMPP).
+  4. Abra http://localhost/phpmyadmin y entre a la pestaña «Importar».
+     No hace falta crear la base antes.
+  5. Elija el ÚNICO archivo SQL del proyecto:
+       base_datos/ferias_sacaba.sql
+     y pulse «Continuar».
+     Ese script elimina una base ferias_sacaba anterior y la crea de nuevo
+     con las 10 tablas y los datos de demostración. Se puede importar las
+     veces que haga falta: el resultado es siempre el mismo.
+     Si ya tenía datos reales, expórtelos antes con phpMyAdmin.
+  6. Abra el sitio:
+       http://localhost/ferias_sacaba/public/
+     El panel del administrador está en:
+       http://localhost/ferias_sacaba/public/index.php?ruta=panel
+
+  IMPORTANTE: base_datos/ferias_sacaba.sql es el único SQL que debe
+  importar. No existen scripts de actualización ni preparadores de demo.
+
+CUENTAS LOCALES DE PRUEBA
+  Administrador: admin@sacaba.bo
+  Contraseña:    SacabaAdmin#2026_Local
+
+  Expositor:     expo@sacaba.bo
+  Contraseña:    SacabaExpo#2026_Local
+
+  Estas cuentas se incluyen solo para una instalación local de
+  demostración. Cambie la contraseña y el correo del administrador antes de
+  publicar el sistema en internet. Las cuentas demo01@… a demo14@… son solo
+  registros del mapa de ejemplo: están desactivadas.
+
+QUÉ TRAE LA DEMOSTRACIÓN
+  - Una feria publicada como «Abierta» con fecha a 30 días, 6 áreas de
+    12 × 9,5 m con pasillo de 1,5 m (8 carpas por área, 48 en total) y
+    14 emprendimientos ya ubicados en el plano.
+  - La página pública, el mapa de carpas y el panel muestran contenido
+    desde el primer inicio, sin configuración adicional.
+  - Puede editar la feria, sus áreas, expositores y catálogos desde el panel.
+
+PRUEBA DEL FLUJO COMPLETO
+  1. Ingrese como administrador y revise «Ferias», «Áreas» y «Reservas».
+  2. Cree una cuenta nueva desde «Crear cuenta» (o use expo@sacaba.bo) y
+     entre a «Mis reservas».
+  3. El expositor elige feria, rubro y una carpa libre; al confirmar, la
+     reserva queda Pendiente y la carpa se retiene.
+  4. Como administrador, confirme o rechace en «Reservas» → «Reservas de
+     carpas». El estado cambia en «Mis reservas» y la carpa se libera al
+     rechazar.
+  5. Para probar la cancelación, reserve con otra cuenta y cancele mientras
+     esté Pendiente.
+
+MÓDULOS DEL PANEL
+  Ferias · Áreas (con plano) · Expositores · Reservas · Mapa de carpas ·
+  Categorías · Instituciones · Usuarios · Tipos de carpa · Configuración.
+
+CORREO
+  El modo inicial es «log»: las reservas funcionan aunque no haya conexión
+  SMTP y los mensajes se anotan en logs/correo.log.
+
+  Para configurar envío real:
+  1. Ingrese como administrador y abra «Configuración».
+  2. Elija SMTP e ingrese servidor, puerto, cifrado, cuenta y contraseña de
+     aplicación. Para Gmail: smtp.gmail.com, puerto 587, TLS. Use una
+     contraseña de aplicación de Google, no la contraseña habitual.
+  3. Guarde y envíe una prueba. La configuración privada se guarda en
+     config/correo.local.php (fuera de public/ y excluida de Git).
+
+CARPA Y MAPA
+  La carpa oficial es de 3 m de frente × 4 m de fondo (12 m²).
+  Las carpas libres se calculan a partir de la cuadrícula del área; solo las
+  reservas ocupadas se guardan en la tabla asignaciones. El pasillo por
+  defecto (1,50 m) se ajusta en «Configuración» y se aplica a áreas nuevas.
+  Las fotos de feria se suben desde «Ferias» (JPG, PNG o WebP verificados).
+
+SEGURIDAD
+  Se usan password_hash, consultas PDO preparadas, CSRF en formularios,
+  sesiones con cookies HttpOnly/SameSite, bloqueo temporal por intentos
+  fallidos y escape HTML. Los errores técnicos se registran en
+  logs/errores.log y no se muestran a los usuarios.
+
+RUTAS PRINCIPALES
+  index.php                          Página pública
+  index.php?ruta=login               Ingreso único para ambos roles
+  index.php?ruta=registro            Registro de expositor
+  index.php?ruta=mi-espacio          Reserva y «Mis reservas»
+  index.php?ruta=panel               Inicio del administrador
+  index.php?ruta=admin/reservas      Confirmar / rechazar reservas
+  index.php?ruta=admin/mapa          Mapa de carpas
+  index.php?ruta=admin/configuracion Correo y pasillo por defecto
+
+Los datos de ejemplo no son información oficial municipal. Compruebe y
+reemplace nombres, fechas, lugares y fotos antes de abrir una feria al
+público.
